@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroBridge - General Knowledge & Learning Sanctuary</title>
+  <meta name="description" content="Interactive bilingual general knowledge quiz platform with dynamic difficulty progression, streak tracking, XP levels, keyboard typing speed test, smart translator, and personalized profiles." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Favicon icon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-container">
+    <!-- ====================================================================
+         SIDEBAR NAVIGATION
+         ==================================================================== -->
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <!-- Brand Header -->
+        <div class="brand-header">
+          <div class="brand-title-wrap">
+            <div class="brand-logo-icon">🧠</div>
+            <div>
+              <div class="brand-name" data-i18n="brand_name">NeuroBridge Tools</div>
+              <div class="brand-sub" data-i18n="brand_sub">WELLNESS SANCTUARY</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Menu Links -->
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a class="nav-link" data-section="dashboard">
+              <span class="nav-icon">📊</span>
+              <span data-i18n="nav_dashboard">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <!-- Learning Module is the active quiz section from the screenshot -->
+            <a class="nav-link active" data-section="quiz">
+              <span class="nav-icon">💡</span>
+              <span data-i18n="nav_learning">Learning Module</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <!-- Typing Speed Test (Replaces Focus Tools) -->
+            <a class="nav-link" data-section="typing">
+              <span class="nav-icon">⌨️</span>
+              <span data-i18n="nav_typing">Typing Speed Test</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <!-- Smart Translator -->
+            <a class="nav-link" data-section="translator">
+              <span class="nav-icon">🌐</span>
+              <span data-i18n="nav_translator">Smart Translator</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <!-- Reading Support -->
+            <a class="nav-link" data-section="reading">
+              <span class="nav-icon">📖</span>
+              <span data-i18n="nav_reading">Reading Support</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-section="study">
+              <span class="nav-icon">📚</span>
+              <span data-i18n="nav_study">Study Organization</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-section="progress">
+              <span class="nav-icon">📈</span>
+              <span data-i18n="nav_progress">Progress</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Sidebar Bottom Area -->
+      <div class="sidebar-bottom">
+        <li class="nav-item" style="list-style: none;">
+          <a class="nav-link" data-section="settings">
+            <span class="nav-icon">⚙️</span>
+            <span data-i18n="nav_settings">Settings</span>
+          </a>
+        </li>
+
+        <!-- + New Session Button (Matches screenshot) -->
+        <button class="btn-new-session" id="btnNewSession">
+          <span>+</span>
+          <span data-i18n="btn_new_session">New Session</span>
+        </button>
+
+        <!-- User Profile Corner Badge (Matches screenshot bottom corner) -->
+        <div class="user-profile-badge" id="userProfileBadge" title="Click to view/edit account or switch">
+          <div class="avatar-wrap">
+            <img class="avatar-img" id="sidebarAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" />
+            <span class="online-dot" id="sidebarOnlineDot"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name" id="sidebarUserName">Sign In</span>
+            <span class="user-tier" id="sidebarUserTier">
+              <span id="sidebarTierStar">⭐</span>
+              <span id="sidebarTierText">Focus Tier: Gold</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         MAIN APP CONTENT
+         ==================================================================== -->
+    <main class="main-content">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <!-- Search Concepts -->
+        <div class="topbar-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="searchConceptsInput" placeholder="Search concepts..." data-i18n-ph="search_placeholder" />
+        </div>
+
+        <!-- Center Nav Breadcrumbs (Matches screenshot) -->
+        <div class="topbar-center-nav">
+          <span class="topbar-tab active" data-i18n="tab_modules">Mod.des</span>
+          <span class="topbar-tab" data-i18n="tab_resources">Resources</span>
+        </div>
+
+        <!-- Actions: Language Toggle, AI Suggestions, Notifications, Mobile Toggle -->
+        <div class="topbar-actions">
+          <!-- Language Toggle (Arabic / English) -->
+          <button class="btn-lang-toggle" id="btnLangToggle" title="Toggle Arabic / English">
+            <span id="langFlag">🇸🇦</span>
+            <span id="langLabel">العربية</span>
+          </button>
+
+          <!-- AI Suggestions Pill Button (Opens Interactive AI Assistant) -->
+          <button class="btn-ai-suggestions" id="btnAiSuggestions">
+            <span>✨</span>
+            <span data-i18n="ai_suggestions">AI Assistant</span>
+          </button>
+
+          <!-- Notifications Bell -->
+          <button class="btn-icon" id="btnNotifications" title="Notifications">
+            <span>🔔</span>
+            <span class="badge-dot" id="notifBadge"></span>
+          </button>
+
+          <!-- Mobile Nav Hamburger -->
+          <button class="btn-icon mobile-nav-toggle" id="btnMobileNav" title="Menu">
+            <span>☰</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <div class="content-body">
+        
+        <!-- ================================================================
+             SECTION 1: LEARNING MODULE (QUIZ - EXACT SCREENSHOT REPLICA)
+             ================================================================ -->
+        <section class="app-section active-section" id="section-quiz">
+          <!-- Quiz Header row -->
+          <div class="quiz-header-row">
+            <div class="quiz-breadcrumb-tag" id="quizBreadcrumb">
+              MODULE 4 • 1 OF 12
+            </div>
+            <div class="quiz-title-wrap">
+              <h1 class="quiz-main-title" data-i18n="quiz_title">General Knowledge Quiz</h1>
+              <button class="quiz-sound-btn" id="btnSpeechSynthesis" title="Listen to Question (Text-to-Speech)">
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Quiz Layout: Question Card on left, Widgets on right -->
+          <div class="quiz-layout-grid">
+            <!-- Left: Question Card -->
+            <div class="question-card">
+              <h2 class="question-prompt" id="questionPrompt">
+                What is the capital of France?
+              </h2>
+
+              <div class="options-list" id="optionsContainer">
+                <!-- Dynamically populated options -->
+              </div>
+
+              <!-- Question Card Footer -->
+              <div class="question-card-footer">
+                <button class="btn-next-question" id="btnNextQuestion">
+                  <span data-i18n="btn_next_question">Next Question</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: AI Assistant & Quiz Stats -->
+            <div class="quiz-side-widgets">
+              <!-- AI Assistant Widget -->
+              <div class="widget-card">
+                <div class="widget-header">
+                  <span class="widget-ai-icon">✨</span>
+                  <span data-i18n="widget_ai_title">AI Assistant</span>
+                </div>
+                <div class="ai-tip-box">
+                  <div class="ai-tip-title" data-i18n="widget_did_you_know">Did you know?</div>
+                  <div class="ai-tip-text" id="aiTipContent">
+                    Testing yourself is one of the most effective ways to strengthen neural pathways and improve long-term retention.
+                  </div>
+                </div>
+                <button class="btn-timer-secondary" id="btnAskAiAboutQuestion" style="width: 100%; margin-top: 12px; font-size: 0.86rem; padding: 8px 14px;">
+                  <span>💬</span> <span data-i18n="btn_ask_ai">Ask AI for Explanation / Hint</span>
+                </button>
+              </div>
+
+              <!-- Quiz Stats Widget -->
+              <div class="widget-card">
+                <div class="widget-header">
+                  <span data-i18n="widget_stats_title">Quiz Stats</span>
+                </div>
+                
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="stat_time">Time Taken</span>
+                  <span class="stat-value" id="statTime">0:00</span>
+                </div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="stat_accuracy">Accuracy</span>
+                  <span class="stat-value highlight-green" id="statAccuracy">0%</span>
+                </div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="stat_streak">Daily Streak</span>
+                  <span class="stat-value" id="statStreak">🔥 1 Day</span>
+                </div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="stat_xp">Experience (XP)</span>
+                  <span class="stat-value highlight-purple" id="statXp">0 XP</span>
+                </div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="stat_tier">Difficulty Tier</span>
+                  <span class="stat-value" id="statTier">Level 1 (Easy)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Actions Bar (Matches Screenshot) -->
+          <div class="quiz-bottom-bar">
+            <button class="btn-bottom-action" id="btnRepeatQuiz">
+              <span>🔄</span>
+              <span data-i18n="action_repeat">REPEAT</span>
+            </button>
+
+            <div class="pill-in-progress">
+              <span class="pulse-dot"></span>
+              <span data-i18n="action_in_progress">IN PROGRESS</span>
+            </div>
+
+            <button class="btn-bottom-action" id="btnSkipQuestion">
+              <span data-i18n="action_next">NEXT</span>
+              <span>→</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 2: KEYBOARD TYPING SPEED TEST (NEW)
+             ================================================================ -->
+        <section class="app-section" id="section-typing">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="typing_title">Keyboard Typing Speed Test</h1>
+            <p class="section-sub" data-i18n="typing_sub">Test how many words you can type in 1 minute with educational facts in Arabic and English.</p>
+          </div>
+
+          <div class="typing-container">
+            <!-- Stats Bar (Timer, WPM, CPM, Accuracy) -->
+            <div class="typing-stats-bar">
+              <div class="typing-stat-card">
+                <div class="typing-stat-val timer" id="typingTimerDisplay">60s</div>
+                <div class="typing-stat-label" data-i18n="typing_time_left">Time Remaining</div>
+              </div>
+              <div class="typing-stat-card">
+                <div class="typing-stat-val" id="typingWpmDisplay">0</div>
+                <div class="typing-stat-label" data-i18n="typing_wpm">WPM (Words / Min)</div>
+              </div>
+              <div class="typing-stat-card">
+                <div class="typing-stat-val acc" id="typingAccDisplay">100%</div>
+                <div class="typing-stat-label" data-i18n="typing_acc">Accuracy</div>
+              </div>
+              <div class="typing-stat-card">
+                <div class="typing-stat-val" id="typingCpmDisplay" style="color: #c084fc;">0</div>
+                <div class="typing-stat-label" data-i18n="typing_cpm">Characters Typed</div>
+              </div>
+            </div>
+
+            <!-- Typing Passage & Input Area -->
+            <div class="typing-box">
+              <div class="typing-lang-selector">
+                <div style="display: flex; gap: 10px;">
+                  <button class="timer-mode-btn active" id="btnTypingLangEn">English (Useful Facts)</button>
+                  <button class="timer-mode-btn" id="btnTypingLangAr">العربية (معلومات مفيدة)</button>
+                </div>
+                <button class="btn-timer-secondary" id="btnNewPassage" style="padding: 6px 14px; font-size: 0.85rem;">
+                  ↻ <span data-i18n="typing_new_text">New Passage</span>
+                </button>
+              </div>
+
+              <!-- Passage text with letter coloring -->
+              <div class="typing-passage" id="typingPassageDisplay">
+                Loading educational text...
+              </div>
+
+              <!-- User Typing Input -->
+              <input type="text" class="typing-input-area" id="typingInput" placeholder="Start typing here... the 60-second timer starts on your first keypress!" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+
+              <div class="typing-actions">
+                <button class="btn-timer-secondary" id="btnResetTyping">↺ <span data-i18n="typing_restart">Restart Test</span></button>
+                <div style="font-size: 0.88rem; color: var(--text-muted);" id="typingTipText">
+                  💡 Tip: Keep steady rhythm and minimize backspaces for higher WPM!
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 3: SMART TRANSLATOR (NEW)
+             ================================================================ -->
+        <section class="app-section" id="section-translator">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="trans_title">Smart AI Translator</h1>
+            <p class="section-sub" data-i18n="trans_sub">Type any word or concept in English or Arabic to translate, hear pronunciation, and see example sentences.</p>
+          </div>
+
+          <div class="translator-container">
+            <div class="trans-panels-grid">
+              <!-- Source Panel -->
+              <div class="trans-panel">
+                <div class="trans-panel-header">
+                  <span class="trans-lang-tag" id="transSourceLangTag">English</span>
+                  <button class="quiz-sound-btn" id="btnSpeakSource" style="width: 34px; height: 34px; font-size: 1rem;" title="Listen">🔊</button>
+                </div>
+                <textarea class="trans-textarea" id="transSourceText" placeholder="Type a word or sentence here (e.g., knowledge, photosynthesis, universe, galaxy)..."></textarea>
+                <div class="trans-panel-footer">
+                  <button class="btn-timer-primary" id="btnExecuteTranslate" style="padding: 8px 24px; font-size: 0.9rem;">
+                    <span data-i18n="trans_btn">Translate</span> →
+                  </button>
+                </div>
+              </div>
+
+              <!-- Swap Button -->
+              <button class="trans-swap-btn" id="btnSwapTransLang" title="Swap languages">⇄</button>
+
+              <!-- Target Panel -->
+              <div class="trans-panel">
+                <div class="trans-panel-header">
+                  <span class="trans-lang-tag" id="transTargetLangTag">العربية (Arabic)</span>
+                  <button class="quiz-sound-btn" id="btnSpeakTarget" style="width: 34px; height: 34px; font-size: 1rem;" title="Listen">🔊</button>
+                </div>
+                <textarea class="trans-textarea" id="transTargetText" placeholder="الترجمة ستظهر هنا..." readonly></textarea>
+                <div class="trans-panel-footer">
+                  <span style="font-size: 0.8rem; color: var(--text-dim);" id="transDetailsText">
+                    Synonyms & Examples
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 4: READING SUPPORT (FIXED & FULLY FUNCTIONAL)
+             ================================================================ -->
+        <section class="app-section" id="section-reading">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="reading_title">Cognitive Reading Support</h1>
+            <p class="section-sub" data-i18n="reading_sub">Train your reading speed with RSVP (Rapid Serial Visual Presentation) and expand your general knowledge.</p>
+          </div>
+
+          <div class="reading-container">
+            <!-- Article Language / Topic Selector -->
+            <div style="display: flex; gap: 10px; margin-bottom: -10px;">
+              <button class="timer-mode-btn active" id="btnArticleNeuro">🧠 Neuroscience Article</button>
+              <button class="timer-mode-btn" id="btnArticleCosmos">🌌 The Cosmos & Stars</button>
+              <button class="timer-mode-btn" id="btnArticleArabic">📖 مقال باللغة العربية</button>
+            </div>
+
+            <!-- Speed Reader Word Display -->
+            <div class="rsvp-word-flasher" id="speedReaderWord">
+              Ready...
+            </div>
+
+            <!-- Controls -->
+            <div class="reading-controls-bar">
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn-timer-primary" id="btnStartReader" style="padding: 10px 24px;">▶ <span data-i18n="reader_start">Start Reading</span></button>
+                <button class="btn-timer-secondary" id="btnResetReader">↺ <span data-i18n="reader_reset">Reset</span></button>
+                <button class="quiz-sound-btn" id="btnSpeakArticle" title="Read entire article aloud with Audio TTS">🔊</button>
+              </div>
+
+              <div style="display: flex; gap: 16px; align-items: center;">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">
+                  <span data-i18n="reader_speed">Speed:</span> 
+                  <strong id="readerWpmDisplay" style="color: #fff;">300 WPM</strong>
+                </label>
+                <input type="range" id="readerSpeedSlider" min="150" max="600" step="25" value="300" style="accent-color: #818cf8; width: 140px;" />
+              </div>
+            </div>
+
+            <!-- Reading Material Selection -->
+            <div class="widget-card">
+              <h3 style="margin-bottom: 12px; font-size: 1.05rem;" id="readerArticleTitle" data-i18n="reader_article_title">Sample Article: How The Human Brain Stores Knowledge</h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7;" id="readerArticleText">
+                Memory formation is an astonishing biological symphony. When we learn new facts or challenge our minds with interactive quizzes, neurons communicate through microscopic junctions called synapses. Repetitive retrieval strengthens these synaptic pathways through Long-Term Potentiation (LTP). This active recall rewires our brain, ensuring that acquired wisdom remains vivid and accessible for years to come.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 5: DASHBOARD
+             ================================================================ -->
+        <section class="app-section" id="section-dashboard">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="dash_title">Cognitive Performance Dashboard</h1>
+            <p class="section-sub" data-i18n="dash_sub">Monitor your learning streaks, XP gains, level milestones, and mastery across topics.</p>
+          </div>
+
+          <!-- Metrics Grid -->
+          <div class="dashboard-metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-box purple">⚡</div>
+              <div class="metric-data">
+                <span class="metric-num" id="dashTotalXp">0</span>
+                <span class="metric-label" data-i18n="dash_metric_xp">Total XP Earned</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box amber">🔥</div>
+              <div class="metric-data">
+                <span class="metric-num" id="dashStreakDays">1</span>
+                <span class="metric-label" data-i18n="dash_metric_streak">Consecutive Days Streak</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box green">🎯</div>
+              <div class="metric-data">
+                <span class="metric-num" id="dashAvgAccuracy">0%</span>
+                <span class="metric-label" data-i18n="dash_metric_accuracy">Average Accuracy</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box rose">🏆</div>
+              <div class="metric-data">
+                <span class="metric-num" id="dashCurrentLevel">Level 1</span>
+                <span class="metric-label" data-i18n="dash_metric_level">Current Focus Rank</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level Progression Bar -->
+          <div class="level-progress-card">
+            <div class="level-top-row">
+              <div class="level-badge-tag">
+                <span>🌟</span>
+                <span id="dashRankTitle">Novice Explorer</span>
+              </div>
+              <span class="stat-value" id="dashLevelProgressText">0 / 100 XP to Level 2</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="dashLevelBarFill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-subtext">
+              <span data-i18n="dash_prog_start">Current Tier</span>
+              <span data-i18n="dash_prog_end">Next Level Milestone</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <button class="btn-new-session" style="max-width: 240px;" onclick="switchSection('quiz')">
+              <span>▶</span>
+              <span data-i18n="dash_btn_resume">Resume Quiz Session</span>
+            </button>
+            <button class="btn-timer-secondary" onclick="switchSection('typing')">
+              <span>⌨️</span>
+              <span>Typing Speed Test</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 6: STUDY ORGANIZATION (3D FLASHCARDS)
+             ================================================================ -->
+        <section class="app-section" id="section-study">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="study_title">Study Organization & Flashcards</h1>
+            <p class="section-sub" data-i18n="study_sub">Master high-yield facts through active recall flashcards and manage your daily learning milestones.</p>
+          </div>
+
+          <div class="flashcards-wrap">
+            <div class="flashcard" id="flashcardBox">
+              <!-- Front Face -->
+              <div class="flashcard-face flashcard-front">
+                <span class="quiz-breadcrumb-tag" id="fcCategory">SCIENCE FLASHCARD</span>
+                <div class="flashcard-prompt" id="fcFrontText">What is the approximate speed of light in a vacuum?</div>
+                <div class="flashcard-hint" data-i18n="fc_tap_flip">💡 Tap anywhere on the card to flip and reveal answer</div>
+              </div>
+              <!-- Back Face -->
+              <div class="flashcard-face flashcard-back">
+                <span class="quiz-breadcrumb-tag" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7;">ANSWER & FACT</span>
+                <div class="flashcard-prompt" id="fcBackText" style="color: #6ee7b7;">300,000 kilometers per second (299,792 km/s)</div>
+                <div class="flashcard-hint" data-i18n="fc_tap_back">💡 Tap to flip back to question</div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 14px;">
+              <button class="btn-timer-secondary" id="btnPrevFc">← <span data-i18n="fc_prev">Previous Card</span></button>
+              <button class="btn-timer-primary" id="btnNextFc"><span data-i18n="fc_next">Next Card</span> →</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 7: PROGRESS & MASTERY ANALYTICS
+             ================================================================ -->
+        <section class="app-section" id="section-progress">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="prog_title">Progress & Mastery Analytics</h1>
+            <p class="section-sub" data-i18n="prog_sub">Detailed breakdown of your cognitive accuracy, difficulty progression, and milestones.</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+            <div class="widget-card">
+              <div class="widget-header" data-i18n="prog_tier_breakdown">Difficulty Tiers Cleared</div>
+              <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span data-i18n="tier_1">Tier 1: Beginner / Easy</span>
+                    <span id="tier1Count">0 / 5 Cleared</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="tier1Bar" style="width: 0%;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span data-i18n="tier_2">Tier 2: Intermediate / Medium</span>
+                    <span id="tier2Count">0 / 5 Cleared</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="tier2Bar" style="width: 0%; background: #a855f7;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span data-i18n="tier_3">Tier 3: Advanced / Hard</span>
+                    <span id="tier3Count">0 / 5 Cleared</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="tier3Bar" style="width: 0%; background: #ec4899;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span data-i18n="tier_4">Tier 4: Expert / High Intelligence</span>
+                    <span id="tier4Count">0 / 5 Cleared</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="tier4Bar" style="width: 0%; background: #f59e0b;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span data-i18n="tier_5">Tier 5: Mastermind / Genius</span>
+                    <span id="tier5Count">0 / 5 Cleared</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="tier5Bar" style="width: 0%; background: #10b981;"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="widget-card">
+              <div class="widget-header" data-i18n="prog_achievements">Achievements & Badges</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
+                <div class="ai-tip-box" style="text-align: center;">
+                  <div style="font-size: 2rem;">🌱</div>
+                  <div style="font-weight: 700; color: #fff; margin-top: 4px;" data-i18n="badge_first_step">First Step</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="badge_first_step_sub">Answered your first quiz question</div>
+                </div>
+
+                <div class="ai-tip-box" style="text-align: center;">
+                  <div style="font-size: 2rem;">🔥</div>
+                  <div style="font-weight: 700; color: #fff; margin-top: 4px;" data-i18n="badge_streak_master">Streak Spark</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="badge_streak_sub">Logged in consecutive days</div>
+                </div>
+
+                <div class="ai-tip-box" style="text-align: center;">
+                  <div style="font-size: 2rem;">⚡</div>
+                  <div style="font-weight: 700; color: #fff; margin-top: 4px;" data-i18n="badge_speed">Quick Thinker</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="badge_speed_sub">Answered question under 8 seconds</div>
+                </div>
+
+                <div class="ai-tip-box" style="text-align: center;">
+                  <div style="font-size: 2rem;">👑</div>
+                  <div style="font-weight: 700; color: #fff; margin-top: 4px;" data-i18n="badge_mastermind">Ascension</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="badge_mastermind_sub">Unlocked higher difficulty tier</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             SECTION 8: SETTINGS & USER PROFILE EDITOR
+             ================================================================ -->
+        <section class="app-section" id="section-settings">
+          <div class="section-header">
+            <h1 class="section-title" data-i18n="settings_title">Account & Preferences</h1>
+            <p class="section-sub" data-i18n="settings_sub">Customize your profile photo, change display name, manage persistent account, and personalize app settings.</p>
+          </div>
+
+          <div class="settings-grid">
+            <!-- Left: Profile Photo & Basic Edit -->
+            <div class="profile-edit-card">
+              <div class="profile-avatar-large" id="avatarUploadTrigger" title="Click to upload custom photo from your device">
+                <img id="settingsAvatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" alt="Profile Avatar" />
+                <div class="avatar-upload-overlay">📷</div>
+              </div>
+              <input type="file" id="avatarFileInput" class="file-input-hidden" accept="image/*" />
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;" data-i18n="settings_avatar_tip">
+                Tap photo to upload image from your phone or computer
+              </p>
+
+              <div class="form-group">
+                <label class="form-label" data-i18n="settings_name_label">Display Name</label>
+                <input type="text" class="form-control" id="settingsDisplayName" placeholder="youssef ahmed" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" data-i18n="settings_email_label">Email / Username (Persistent Account)</label>
+                <input type="text" class="form-control" id="settingsEmail" readonly style="opacity: 0.7;" />
+              </div>
+
+              <button class="btn-save-settings" id="btnSaveProfile" data-i18n="settings_btn_save">Save Profile Changes</button>
+            </div>
+
+            <!-- Right: App Options & Account Switcher -->
+            <div>
+              <div class="widget-card" style="margin-bottom: 24px;">
+                <div class="widget-header" data-i18n="settings_app_prefs">Application Preferences</div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="settings_lang_label">Interface Language</span>
+                  <button class="btn-timer-secondary" id="settingsToggleLang" style="padding: 6px 16px;">
+                    <span id="settingsLangText">العربية (Arabic)</span>
+                  </button>
+                </div>
+
+                <div class="stat-row">
+                  <span class="stat-label" data-i18n="settings_sound_fx">Sound Effects & TTS Narration</span>
+                  <input type="checkbox" id="settingsSoundToggle" checked style="width: 20px; height: 20px; accent-color: #818cf8;" />
+                </div>
+                <!-- Note: 'Difficulty Step Every 5 Questions' removed as requested by user -->
+              </div>
+
+              <!-- Persistent Account Switcher / Logout -->
+              <div class="widget-card">
+                <div class="widget-header" data-i18n="settings_auth_management">Account Management</div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;" data-i18n="settings_auth_desc">
+                  Your progress is saved permanently. If you uninstall or reinstall the app, you can easily log back into your existing account using your credentials!
+                </p>
+                
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="btn-timer-secondary" id="btnOpenAuthModal" style="color: #818cf8; border-color: rgba(129, 140, 248, 0.4);">
+                    <span data-i18n="settings_btn_switch">New Account / Sign In</span>
+                  </button>
+                  <button class="btn-timer-secondary" id="btnLogout" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.4);">
+                    <span data-i18n="settings_btn_logout">Logout</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       AUTHENTICATION MODAL (LOGIN / NEW ACCOUNT / PERSISTENCE)
+       ==================================================================== -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-window">
+      <button class="modal-close-btn" id="closeAuthModal">✕</button>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab" id="tabLogin" data-i18n="auth_login_tab">Sign In</button>
+        <button class="auth-tab active" id="tabSignup" data-i18n="auth_signup_tab">New Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_username_label">Username or Email</label>
+          <input type="text" class="form-control" id="loginUsername" required placeholder="youssef@gmail.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_password_label">Password</label>
+          <input type="password" class="form-control" id="loginPassword" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-save-settings" style="margin-top: 8px;" data-i18n="auth_btn_signin">Sign In & Load Progress</button>
+      </form>
+
+      <!-- Signup / New Account Form (with placeholders youssef ahmed and youssef@gmail.com) -->
+      <form id="signupForm" style="display: block;">
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_display_name">Full Name</label>
+          <input type="text" class="form-control" id="signupDisplayName" required placeholder="youssef ahmed" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_username_label">Username or Email</label>
+          <input type="text" class="form-control" id="signupUsername" required placeholder="youssef@gmail.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_password_label">Password</label>
+          <input type="password" class="form-control" id="signupPassword" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-save-settings" style="margin-top: 8px;" data-i18n="auth_btn_signup">Create New Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       INTERACTIVE AI ASSISTANT CHAT MODAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="aiAssistantModal">
+    <div class="ai-modal-window">
+      <!-- Header -->
+      <div class="ai-chat-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">✨</span>
+          <div>
+            <div style="font-weight: 800; color: #fff; font-size: 1.05rem;" data-i18n="ai_modal_title">NeuroBridge AI Assistant</div>
+            <div style="font-size: 0.72rem; color: #818cf8;">Online • Ready to explain & assist</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeAiModal" style="position: static;">✕</button>
+      </div>
+
+      <!-- Messages Stream -->
+      <div class="ai-chat-body" id="aiChatMessages">
+        <div class="ai-chat-msg bot">
+          <div style="font-size: 1.4rem;">🤖</div>
+          <div class="ai-msg-bubble" id="aiInitialWelcome">
+            Hello! I am your NeuroBridge AI Assistant. You can ask me to explain any question, give you fascinating facts, test your knowledge, or translate concepts. How can I assist you today?
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="ai-chips-wrap">
+        <button class="ai-chip-btn" data-prompt="Explain current question">💡 Explain Current Question</button>
+        <button class="ai-chip-btn" data-prompt="Give me a mind-blowing science fact">🌌 Mind-Blowing Science Fact</button>
+        <button class="ai-chip-btn" data-prompt="How can I improve my memory?">🧠 Memory Improvement Tips</button>
+        <button class="ai-chip-btn" data-prompt="اشرح لي هذا السؤال بالعربي">🇸🇦 اشرح لي السؤال الحالي</button>
+      </div>
+
+      <!-- Input Bar -->
+      <form class="ai-chat-input-bar" id="aiChatForm">
+        <input type="text" class="ai-chat-input" id="aiUserInput" placeholder="Ask AI anything about the quiz or general knowledge..." autocomplete="off" />
+        <button type="submit" class="btn-timer-primary" style="padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.9rem;">
+          Send
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       LEVEL-UP & CELEBRATION MODAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="celebrationModal">
+    <div class="modal-window" style="text-align: center;">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🎉</div>
+      <h2 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 8px;" id="celebTitle">Level Up!</h2>
+      <p style="color: #c7d2fe; font-size: 1.05rem; margin-bottom: 20px;" id="celebMessage">You advanced to Focus Tier: Gold!</p>
+      <div class="level-badge-tag" style="font-size: 1.1rem; padding: 10px 24px; margin-bottom: 24px;" id="celebBadgeTag">
+        ⭐ Level 2 • Scholar
+      </div>
+      <button class="btn-save-settings" id="closeCelebModal" data-i18n="btn_continue">Keep Going! 🚀</button>
+    </div>
+  </div>
+
+  <!-- Difficulty Boost Toast Popup -->
+  <div class="difficulty-toast" id="diffToast">
+    <div style="font-size: 2rem;">⚡</div>
+    <div>
+      <div style="font-weight: 800; font-size: 1rem;" id="toastTitle">DIFFICULTY INCREASED!</div>
+      <div style="font-size: 0.82rem; color: #c7d2fe;" id="toastDesc">You answered 5 questions correctly. Unlocking Level 2: Intermediate!</div>
+    </div>
+  </div>
+
+  <!-- Load Questions Bank & Application Script -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
